@@ -28,7 +28,7 @@ describe("Applications API", () => {
     expect(response.body).toEqual({ error: "Missing fields" });
   });
 
-  it("rejects a request when role is missing", async () => {
+  it("rejects a request when role is missing but name is provided", async () => {
     const response = await request(app).post("/applications").send({
       name: "Alice",
     });
