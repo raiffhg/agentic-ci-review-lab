@@ -4,6 +4,7 @@ export interface Application {
   id: number;
   name: string;
   role: string;
+  time: number;
 }
 
 const applications: Application[] = [];
@@ -22,10 +23,13 @@ app.post("/applications", (req, res) => {
     return res.status(400).json({ error: "Missing fields" });
   }
 
+  const time = Date.now();
+
   const newApplication: Application = {
     id: applications.length + 1,
     name,
     role,
+    time
   };
 
   applications.push(newApplication);
