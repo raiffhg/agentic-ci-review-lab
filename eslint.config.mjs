@@ -70,5 +70,11 @@ export default tseslint.config(
         },
       ],
     },
+  },
+  {
+    files: ["tests/review-policy.test.ts"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
   }
 );

@@ -68,13 +68,27 @@ The GitHub Actions workflow runs on pushes and pull requests. It is intentionall
 
 This mirrors how a disciplined developer would validate changes locally before opening a pull request.
 
-## Custom Review Rule
+## Custom Review Policy
 
-The first review policy is simple:
+The custom reviewer is deterministic, not AI-based. It now enforces a small set of repository policies:
 
 - if files in `src/` change, at least one file in `tests/` should also change
+- if `package.json` changes, `package-lock.json` should change too
+- if a workflow under `.github/workflows/` changes, that change should be documented in `README.md` or `docs/`
 
-This is a deterministic rule, not an AI judgment. It acts like a lightweight automated reviewer that enforces one team expectation. That makes it a good baseline for later comparison with tools like CodeRabbit.
+This gives the repo a more realistic automated review baseline. It behaves like a lightweight internal policy bot and gives you something concrete to compare against an AI reviewer later.
+
+## Why This Matters
+
+The project is now doing two different kinds of review:
+
+- quality gates, such as typechecking, tests, linting, and formatting
+- policy review, where repository conventions are enforced automatically
+
+That separation is important because later, when you add an AI reviewer, you will be able to compare:
+
+- rules that are deterministic and always enforceable
+- feedback that is contextual and interpretive
 
 ## Current API
 

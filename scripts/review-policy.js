@@ -28,24 +28,85 @@ function getChangedFiles() {
   return execGit(["diff", "--name-only", base, head]);
 }
 
-function main() {
-  const changedFiles = getChangedFiles();
-  const sourceChanged = changedFiles.some((file) => file.startsWith("src/"));
-  const testsChanged = changedFiles.some((file) => file.startsWith("tests/"));
-
-  if (!sourceChanged) {
-    console.log("Review policy passed: no source changes detected.");
-    return;
-  }
-
-  if (!testsChanged) {
-    console.error(
-      "Review policy failed: changes in src/ must include at least one updated file in tests/."
-    );
-    process.exit(1);
-  }
-
-  console.log("Review policy passed: source changes include test updates.");
+function hasMatch(changedFiles, prefix) {
+  return changedFiles.some((file) => file.startsWith(prefix));
 }
 
-main();
+function evaluatePolicies(changedFiles) {
+  const results = [];
+
+  if (hasMatch(changedFiles, "src/")) {
+    results.push({
+      name: "source-requires-tests",
+      passed: hasMatch(changedFiles, "tests/"),
+      message:
+        "Changes in src/ must include at least one updated file in tests/.",
+    });
+  }
+
+  if (changedFiles.includes("package.json")) {
+    results.push({
+      name: "package-requires-lockfile",
+      passed: changedFiles.includes("package-lock.json"),
+      message:
+        "Changes in package.json must include a matching update to package-lock.json.",
+    });
+  }
+
+  if (hasMatch(changedFiles, ".github/workflows/")) {
+    results.push({
+      name: "workflow-requires-docs",
+      passed:
+        changedFiles.includes("README.md") || hasMatch(changedFiles, "docs/"),
+      message:
+        "Workflow changes must be documented in README.md or the docs/ folder.",
+    });
+  }
+
+  return results;
+}
+
+function reportResults(results) {
+  if (results.length === 0) {
+    console.log("Review policy passed: no policy checks were triggered.");
+    return true;
+  }
+
+  let hasFailures = false;
+
+  for (const result of results) {
+    if (result.passed) {
+      console.log(`Policy passed [${result.name}]: ${result.message}`);
+      continue;
+    }
+
+    hasFailures = true;
+    console.error(`Review policy failed [${result.name}]: ${result.message}`);
+
+    if (process.env.GITHUB_ACTIONS === "true") {
+      console.error(`::error title=Review policy failed::${result.message}`);
+    }
+  }
+
+  return !hasFailures;
+}
+
+function main() {
+  const changedFiles = getChangedFiles();
+  const results = evaluatePolicies(changedFiles);
+  const passed = reportResults(results);
+
+  if (!passed) {
+    process.exit(1);
+  }
+}
+
+if (require.main === module) {
+  main();
+}
+
+module.exports = {
+  evaluatePolicies,
+  getChangedFiles,
+  reportResults,
+};
