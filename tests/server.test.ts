@@ -16,6 +16,7 @@ describe("Applications API", () => {
     expect(response.body.name).toBe("Alice");
     expect(response.body.role).toBe("Engineer");
     expect(response.body.id).toBe(1);
+    expect(response.body.time).toBeDefined();
   });
 
   it("rejects a request when name is missing, but role is provided", async () => {
@@ -55,11 +56,13 @@ describe("Applications API", () => {
         id: 1,
         name: "Alice",
         role: "Engineer",
+        time: expect.any(Number),
       },
       {
         id: 2,
         name: "Bea",
         role: "Designer",
+        time: expect.any(Number),
       },
     ]);
   });
