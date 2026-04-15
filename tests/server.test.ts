@@ -18,7 +18,7 @@ describe("Applications API", () => {
     expect(response.body.id).toBe(1);
   });
 
-  it("rejects a request when name is missing", async () => {
+  it("rejects a request when name is missing, but role is provided", async () => {
     const response = await request(app).post("/applications").send({
       role: "Engineer",
     });
