@@ -19,7 +19,7 @@ app.post("/applications", (req, res) => {
   const { name, role } = req.body as Partial<Application>;
 
   if (!name || !role) {
-    return res.status(400).json({ error: "Missing fields" });
+    return res.status(400).json({ error: "Invalid input" });
   }
 
   const newApplication: Application = {
