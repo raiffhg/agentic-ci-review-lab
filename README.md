@@ -68,6 +68,14 @@ The GitHub Actions workflow runs on pushes and pull requests. It is intentionall
 
 This mirrors how a disciplined developer would validate changes locally before opening a pull request.
 
+## Pull Request Workflow
+
+The repository now includes a pull request template and `CODEOWNERS` file so the project feels closer to a real team workflow.
+
+- `CODEOWNERS` defines the default reviewer ownership for the repo areas
+- the PR template prompts contributors to explain the change and confirm the validation steps they ran
+- CI still acts as the automatic gate, but the PR metadata now makes the human-review side clearer too
+
 ## Custom Review Policy
 
 The custom reviewer is deterministic, not AI-based. It now enforces a small set of repository policies:

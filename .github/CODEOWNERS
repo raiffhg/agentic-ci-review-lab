@@ -1,0 +1,10 @@
+# Default owner for the repository.
+* @raiffhg
+
+# Application code and tests.
+/src/ @raiffhg
+/tests/ @raiffhg
+
+# CI and review automation.
+/.github/ @raiffhg
+/scripts/ @raiffhg
