@@ -102,10 +102,19 @@ That separation is important because later, when you add an AI reviewer, you wil
 
 ## Current API
 
-The API is intentionally tiny:
+The API is intentionally tiny, but it now has a basic application lifecycle:
 
 - `POST /applications` creates a job application record
+- `GET /applications/:id` returns a single application by id
 - `GET /applications` lists all created application records
+- `PATCH /applications/:id/status` updates the application status
+
+Applications are created with a default `applied` status and can move through a simple workflow:
+
+- `applied`
+- `interviewing`
+- `offered`
+- `rejected`
 
 Data is stored in memory so the project stays easy to reason about during the CI and review experiments.
 
