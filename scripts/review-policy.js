@@ -1,4 +1,5 @@
 const { execFileSync } = require("node:child_process");
+const { appendFileSync } = require("node:fs");
 
 function execGit(args) {
   const output = execFileSync("git", args, {
@@ -66,6 +67,45 @@ function evaluatePolicies(changedFiles) {
   return results;
 }
 
+function formatSummary(changedFiles, results) {
+  const lines = ["## Review Policy Summary", ""];
+
+  if (changedFiles.length === 0) {
+    lines.push("- No changed files detected.");
+  } else {
+    lines.push("### Changed Files", "");
+
+    for (const file of changedFiles) {
+      lines.push(`- \`${file}\``);
+    }
+  }
+
+  lines.push("");
+  lines.push("### Policy Results", "");
+
+  if (results.length === 0) {
+    lines.push("- No policy checks were triggered.");
+    return `${lines.join("\n")}\n`;
+  }
+
+  for (const result of results) {
+    const icon = result.passed ? "PASS" : "FAIL";
+    lines.push(`- **${icon}** \`${result.name}\`: ${result.message}`);
+  }
+
+  return `${lines.join("\n")}\n`;
+}
+
+function writeStepSummary(changedFiles, results) {
+  const summaryFile = process.env.GITHUB_STEP_SUMMARY;
+
+  if (!summaryFile) {
+    return;
+  }
+
+  appendFileSync(summaryFile, formatSummary(changedFiles, results), "utf8");
+}
+
 function reportResults(results) {
   if (results.length === 0) {
     console.log("Review policy passed: no policy checks were triggered.");
@@ -77,6 +117,11 @@ function reportResults(results) {
   for (const result of results) {
     if (result.passed) {
       console.log(`Policy passed [${result.name}]: ${result.message}`);
+      if (process.env.GITHUB_ACTIONS === "true") {
+        console.log(
+          `::notice title=Policy passed (${result.name})::${result.message}`
+        );
+      }
       continue;
     }
 
@@ -84,7 +129,9 @@ function reportResults(results) {
     console.error(`Review policy failed [${result.name}]: ${result.message}`);
 
     if (process.env.GITHUB_ACTIONS === "true") {
-      console.error(`::error title=Review policy failed::${result.message}`);
+      console.error(
+        `::error title=Review policy failed (${result.name})::${result.message}`
+      );
     }
   }
 
@@ -94,6 +141,7 @@ function reportResults(results) {
 function main() {
   const changedFiles = getChangedFiles();
   const results = evaluatePolicies(changedFiles);
+  writeStepSummary(changedFiles, results);
   const passed = reportResults(results);
 
   if (!passed) {
@@ -107,6 +155,8 @@ if (require.main === module) {
 
 module.exports = {
   evaluatePolicies,
+  formatSummary,
   getChangedFiles,
   reportResults,
+  writeStepSummary,
 };

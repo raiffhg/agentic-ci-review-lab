@@ -1,8 +1,13 @@
-const { evaluatePolicies } = require("../scripts/review-policy") as {
-  evaluatePolicies: (
-    changedFiles: string[]
-  ) => Array<{ name: string; passed: boolean; message: string }>;
-};
+const { evaluatePolicies, formatSummary } =
+  require("../scripts/review-policy") as {
+    evaluatePolicies: (
+      changedFiles: string[]
+    ) => Array<{ name: string; passed: boolean; message: string }>;
+    formatSummary: (
+      changedFiles: string[],
+      results: Array<{ name: string; passed: boolean; message: string }>
+    ) => string;
+  };
 
 describe("review policy", () => {
   it("passes when no policy-triggering files changed", () => {
@@ -70,5 +75,23 @@ describe("review policy", () => {
           "Changes in package.json must include a matching update to package-lock.json.",
       },
     ]);
+  });
+
+  it("formats a GitHub step summary with changed files and policy results", () => {
+    const summary = formatSummary(
+      ["src/app.ts", "tests/server.test.ts"],
+      [
+        {
+          name: "source-requires-tests",
+          passed: true,
+          message:
+            "Changes in src/ must include at least one updated file in tests/.",
+        },
+      ]
+    );
+
+    expect(summary).toContain("## Review Policy Summary");
+    expect(summary).toContain("- `src/app.ts`");
+    expect(summary).toContain("**PASS** `source-requires-tests`");
   });
 });

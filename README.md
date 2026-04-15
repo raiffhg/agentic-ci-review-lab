@@ -86,6 +86,8 @@ The custom reviewer is deterministic, not AI-based. It now enforces a small set 
 
 This gives the repo a more realistic automated review baseline. It behaves like a lightweight internal policy bot and gives you something concrete to compare against an AI reviewer later.
 
+When the reviewer runs inside GitHub Actions, it now also writes a step summary and emits GitHub notices or errors for each triggered policy. That makes the CI output feel more like a real automated reviewer instead of a single opaque script failure.
+
 ## Why This Matters
 
 The project is now doing two different kinds of review:
