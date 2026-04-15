@@ -29,7 +29,7 @@ app.post("/applications", (req, res) => {
     id: applications.length + 1,
     name,
     role,
-    time
+    time,
   };
 
   applications.push(newApplication);
