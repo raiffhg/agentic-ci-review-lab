@@ -26,10 +26,22 @@ export function resetApplications(): void {
 const app = express();
 app.use(express.json());
 
+/**
+ * Retrieve an application by its numeric id.
+ *
+ * @param id - The numeric id of the application to find
+ * @returns The application with the given id, or `undefined` if none exists
+ */
 function findApplication(id: number): Application | undefined {
   return applications.find((application) => application.id === id);
 }
 
+/**
+ * Checks whether a value is one of the defined application statuses.
+ *
+ * @param value - The value to validate as an application status
+ * @returns `true` if `value` is a valid `ApplicationStatus`, `false` otherwise.
+ */
 function isApplicationStatus(value: unknown): value is ApplicationStatus {
   return (
     typeof value === "string" &&
